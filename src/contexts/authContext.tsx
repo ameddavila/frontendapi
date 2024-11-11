@@ -27,28 +27,33 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const location = useLocation();
 
   // Función de login que usa el servicio de login
-  const login = async (username: string, password: string, csrfToken: string) => {
-    try {
-      if (!csrfToken) {
-        throw new Error('CSRF token no disponible');
-      }
-      console.log("Intentando iniciar sesión con usuario:", username);
-
-      const data = await loginService(username, password, csrfToken); // Pasamos el CSRF token público
-      console.log("Respuesta del login:", data);
-
-      // Actualizar el estado de usuario y autenticación
-      setUser(data.user);
-      setIsAuthenticated(true);
-
-      // Actualizar el token CSRF después del login
-      setCsrfToken(data.csrfToken);
-      console.log("Inicio de sesión exitoso. Usuario autenticado:", data.user);
-    } catch (error) {
-      console.error('Error en el inicio de sesión:', error);
-      throw new Error('Error en el inicio de sesión');
+const login = async (username: string, password: string, csrfToken: string) => {
+  try {
+    // Verifica que el token CSRF público esté disponible antes de intentar iniciar sesión
+    if (!csrfToken) {
+      throw new Error('CSRF token no disponible');
     }
-  };
+
+    console.log("Intentando iniciar sesión con usuario:", username);
+
+    // Llama a loginService y pasa las credenciales y el CSRF token público
+    const data = await loginService(username, password, csrfToken); 
+    console.log("Respuesta del login:", data);
+
+    // Actualiza el estado del contexto con el usuario autenticado y cambia el estado a "autenticado"
+    setUser(data.user);
+    setIsAuthenticated(true);
+
+    // Guarda el nuevo token CSRF autenticado en el estado del contexto para las solicitudes protegidas
+    setCsrfToken(data.csrfToken);
+    console.log("Inicio de sesión exitoso. Usuario autenticado:", data.user);
+    
+  } catch (error) {
+    // Maneja cualquier error durante el inicio de sesión
+    console.error('Error en el inicio de sesión:', error);
+    throw new Error('Error en el inicio de sesión');
+  }
+};
 
   // Función de logout
   const logout = async () => {

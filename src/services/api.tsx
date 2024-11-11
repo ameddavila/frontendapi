@@ -8,14 +8,17 @@ const api = axios.create({
 });
 
 // Interceptor de solicitudes para agregar el CSRF token automáticamente
-api.interceptors.request.use(async (config) => {
-  const csrfToken = localStorage.getItem('csrfToken');
-  if (csrfToken) {
-    config.headers['CSRF-Token'] = csrfToken;  // Añadir el token CSRF en las cabeceras
+api.interceptors.request.use(
+  async (config) => {
+    const csrfToken = localStorage.getItem('csrfToken') || document.cookie.split('; ').find(row => row.startsWith('csrfToken='))?.split('=')[1];
+    if (csrfToken) {
+      config.headers['x-csrf-token'] = csrfToken;  // Añadir el token CSRF en las cabeceras
+    }
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
   }
-  return config;
-}, (error) => {
-  return Promise.reject(error);
-});
+);
 
 export default api;

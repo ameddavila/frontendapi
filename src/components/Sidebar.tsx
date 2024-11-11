@@ -1,34 +1,43 @@
 import React, { useState } from 'react';
 import { Drawer, List, Accordion, AccordionSummary, AccordionDetails, Typography, ListItemIcon, Button, Box } from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import HomeIcon from '@mui/icons-material/Home'; // Ejemplo de icono para el menu "Home"
+import HomeIcon from '@mui/icons-material/Home'; // Ejemplo de icono para el menú "Home"
+import PeopleIcon from '@mui/icons-material/People';
+import SecurityIcon from '@mui/icons-material/Security';
+import DashboardIcon from '@mui/icons-material/Dashboard';
+import RestaurantIcon from '@mui/icons-material/Restaurant';
+import SettingsIcon from '@mui/icons-material/Settings';
 import LogoutIcon from '@mui/icons-material/Logout';
-import { useTheme } from '@mui/material/styles'; // Importar el tema
+import Assignment from '@mui/icons-material/Assignment';
+import { useTheme } from '@mui/material/styles'; // Importar el tema personalizado
 import { useNavigate } from 'react-router-dom';
-import Logo from './Logo'; // Importar el componente Logo
-import { logout } from '../services/authService'; // Importar el servicio de logout
+import Logo from './Logo'; // Componente de logo
+import { logout } from '../services/authService'; // Servicio para cerrar sesión
+import { Theme } from '@mui/material/styles';
 
-const drawerWidth = 240;
+const drawerWidth = 240; // Define el ancho del sidebar cuando está expandido
 
 interface SidebarProps {
   open: boolean;
-  menuItems: any[]; // Recibir el menú desde las props
+  menuItems: any[]; // Elementos del menú que serán recibidos como props
 }
 
 const Sidebar: React.FC<SidebarProps> = ({ open, menuItems }) => {
-  const theme = useTheme(); // Usar el tema personalizado
-  const navigate = useNavigate(); // Para la navegación
-  const [expanded, setExpanded] = useState<string | false>(false); // Control del menú expandido
-  const [activeSection, setActiveSection] = useState<string | null>(null); // Control del ítem activo
+  const theme = useTheme(); // Obtiene el tema personalizado
+  const navigate = useNavigate(); // Hook para navegación entre rutas
+  const [expanded, setExpanded] = useState<string | false>(false); // Estado para el panel expandido
+  const [activeSection, setActiveSection] = useState<string | null>(null); // Estado para el ítem activo
 
+  // Controla la expansión y colapso de cada acordeón
   const handleAccordionToggle = (panel: string) => {
     setExpanded(expanded === panel ? false : panel);
-    setActiveSection(panel); // Marcar la sección como activa
+    setActiveSection(panel); // Marca la sección como activa al expandirse
   };
 
+  // Manejo del cierre de sesión llamando al servicio correspondiente
   const handleLogout = async () => {
     try {
-      await logout();  // Llamada al servicio de logout
+      await logout(); // Llama al servicio de logout
     } catch (error) {
       console.error('Error al cerrar sesión:', error);
     }
@@ -39,101 +48,134 @@ const Sidebar: React.FC<SidebarProps> = ({ open, menuItems }) => {
       variant="permanent"
       open={open}
       sx={{
-        width: open ? drawerWidth : 60,
+        width: open ? drawerWidth : 60, // Cambia el ancho según el estado de apertura
         flexShrink: 0,
         '& .MuiDrawer-paper': {
           width: open ? drawerWidth : 60,
-          transition: 'width 0.5s ease', // Transición suave
-          backgroundColor: theme.palette.primary.dark, // Fondo más oscuro para el sidebar
-          color: theme.palette.text.primary, // Color del texto principal
-          boxShadow: '2px 0 5px rgba(0, 0, 0, 0.2)', // Sombra a la derecha
+          transition: 'width 0.5s ease', // Animación de transición del ancho
+          backgroundColor: theme.palette.background.default, // Fondo del sidebar
+          color: theme.palette.text.primary, // Color de texto en el sidebar
+          boxShadow: '2px 0 5px rgba(0, 0, 0, 0.2)', // Sombra para un efecto de profundidad
           display: 'flex',
-          flexDirection: 'column', // Distribuir el contenido verticalmente
-          justifyContent: 'space-between', // Asegurarse de que el contenido esté bien distribuido
-          height: '100vh', // Altura completa de la pantalla
-          overflowX: 'hidden', // Evitar el scroll lateral
+          flexDirection: 'column',
+          justifyContent: 'space-between',
+          height: '100vh',
+          overflowX: 'hidden',
         },
       }}
     >
-      {/* Logo en el sidebar */}
+      {/* Componente Logo en la parte superior del sidebar */}
       <Box
         sx={{
-          paddingBottom: '10px', // Espacio interno para el logo
-          borderBottom: `2px solid ${theme.palette.primary.light}`, // Línea divisoria debajo del logo
+          width: '100%', // Asegura que el contenedor del logo ocupe todo el ancho
+          height: { xs: 56, sm: 64 }, // Coincide con la altura del Header en diferentes tamaños de pantalla
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: open ? 'flex-start' : 'center',
+          paddingLeft: open ? '16px' : '0', // Añade padding cuando está expandido
+          transition: 'width 0.3s ease, padding 0.3s ease', // Transición suave para ancho y padding
+          backgroundColor: (theme: Theme) => theme.palette.primary.main, // Especifica el tipo Theme
+          borderBottom: (theme: Theme) => `2px solid ${theme.palette.primary.light}`, // Especifica el tipo Theme también aquí
+        
+          // Ajustes para pantallas pequeñas
+          ['@media (max-width:600px)']: { 
+            height: 56, // Coincide con la altura del Header en pantallas pequeñas
+            paddingLeft: 0, // Elimina padding en pantallas móviles si no es necesario
+          },
         }}
+        
       >
         <Logo open={open} />
       </Box>
 
-      {/* Contenedor de los menús */}
+      {/* Contenedor de los elementos del menú */}
       <Box
         sx={{
-          flexGrow: 1, // Permitir que el contenedor crezca según el contenido
-          overflowY: 'scroll', // Asegura que los menús sean desplazables solo verticalmente
+          flexGrow: 1,
+          overflowY: 'scroll', // Permite desplazarse si el contenido es extenso
           padding: '10px 5px',
-          overflowX: 'hidden', // Quitar el scroll lateral
+          overflowX: 'hidden',
           '::-webkit-scrollbar': {
-            width: '0px', // Quitar el scrollbar en Chrome, Safari y otros navegadores basados en WebKit
+            width: '0px', // Oculta la barra de desplazamiento en Chrome
           },
-          'msOverflowStyle': 'none',  // Quitar el scrollbar en Internet Explorer y Edge
-          'scrollbarWidth': 'none',  // Quitar el scrollbar en Firefox
+          'msOverflowStyle': 'none', // Oculta la barra en Edge/IE
+          'scrollbarWidth': 'none', // Oculta la barra en Firefox
         }}
       >
         <List sx={{ padding: 0 }}>
           {menuItems.map((item, index) => (
             <Accordion
               key={index}
-              expanded={open && expanded === item.section} // Expandir solo si el sidebar está abierto
+              expanded={open && expanded === item.section} // Control de expansión
               onChange={() => handleAccordionToggle(item.section)}
               sx={{
                 width: '100%',
-                boxShadow: 'none', // Sin sombra para un estilo más simple
-                color: activeSection === item.section ? theme.palette.text.secondary : theme.palette.text.primary, // Color del texto en el estado activo
-                backgroundColor: activeSection === item.section ? theme.palette.accent.main : 'transparent', // Fondo del menú activo
-                transition: 'background-color 0.3s ease, color 0.3s ease', // Transición suave para el color y fondo
-                borderRadius: '8px', // Bordes redondeados
-                margin: '4px 0', // Reducir el espacio entre ítems
-                padding: '0 4px', // Reducir el padding lateral para que se vea más compacto
+                boxShadow: 'none',
+                color: activeSection === item.section ? theme.palette.error.main : theme.palette.text.primary, // Cambia color cuando está activo
+                backgroundColor: activeSection === item.section ? theme.palette.accent.main : 'transparent', // Cambia fondo cuando está activo
+                transition: 'background-color 0.3s ease, color 0.3s ease',
+                borderRadius: '8px',
+                margin: '4px 0',
+                padding: '0 8px',
                 '&:hover': {
-                  backgroundColor: 'rgba(255, 255, 255, 0.2)', // Efecto de hover más claro
-                  transform: 'scale(1.03)', // Efecto visual al pasar el mouse
-                  transition: 'all 0.3s ease', // Transición más impactante al hacer hover
+                  backgroundColor: theme.palette.secondary.light, // Fondo en hover
+                  color: theme.palette.error.main, // Color en hover
+                  transform: 'scale(1.03)', // Efecto de escala al hacer hover
                 },
               }}
             >
               <AccordionSummary
-                expandIcon={open ? <ExpandMoreIcon sx={{ color: activeSection === item.section ? theme.palette.text.secondary : theme.palette.text.primary }} /> : null} // Ícono de expandir
+                expandIcon={open ? <ExpandMoreIcon sx={{ color: activeSection === item.section ? theme.palette.error.main : theme.palette.text.primary }} /> : null}
                 aria-controls={`${item.section}-content`}
                 id={`${item.section}-header`}
                 sx={{
                   display: 'flex',
                   alignItems: 'center',
-                  justifyContent: open ? 'flex-start' : 'center', // Centrar el contenido cuando el sidebar esté contraído
-                  borderRadius: '8px', // Bordes redondeados más notorios
-                  color: activeSection === item.section ? theme.palette.text.secondary : theme.palette.text.primary, // Texto blanco cuando está activo
-                  padding: '5px 8px', // Reducir el padding
+                  justifyContent: open ? 'flex-start' : 'center',
+                  borderRadius: '8px',
+                  color: activeSection === item.section ? theme.palette.common.white : theme.palette.error.main,
+                  padding: '8px 12px', // Ajuste del padding
                 }}
               >
                 <ListItemIcon
                   sx={{
-                    color: activeSection === item.section ? theme.palette.text.secondary : theme.palette.text.primary,
-                    minWidth: open ? '36px' : '30px', // Tamaño reducido del ícono
+                    color: activeSection === item.section ? theme.palette.error.main : theme.palette.error.main,
+                    minWidth: open ? '36px' : '30px',
                   }}
                 >
-                  {item.icon ? item.icon : <HomeIcon />} {/* Ícono del menú o uno por defecto */}
+                  {/* Asignación de íconos basada en el nombre de la sección */}
+                  {(() => {
+                      switch (item.section) {
+                        case 'RRHH':
+                          return <PeopleIcon />;
+                        case 'Seguros':
+                          return <SecurityIcon />;
+                        case 'Planificación':
+                          return <Assignment/>;
+                        case 'Administración':
+                          return <SettingsIcon />;
+                        case 'Dashboard':
+                          return <DashboardIcon />;
+                        case 'Serv. Nutrición':
+                          return <RestaurantIcon />;
+                        default:
+                          return <HomeIcon />; // Ícono predeterminado si no se encuentra coincidencia
+                      }
+                  })()}
                 </ListItemIcon>
-                {open && <Typography sx={{ flexGrow: 1, fontSize: '0.85rem', color: activeSection === item.section ? theme.palette.text.secondary : theme.palette.text.primary }}>{item.section}</Typography>} {/* Texto más pequeño */}
+                {open && <Typography sx={{ flexGrow: 1, fontSize: '0.95rem', fontWeight: 'bold' }}>{item.section}</Typography>}
               </AccordionSummary>
               <AccordionDetails
                 sx={{
-                  paddingLeft: open ? 3 : 0, // Espacio para los submenús
-                  backgroundColor: 'rgba(255, 255, 255, 0.05)', // Fondo transparente para los subitems
-                  borderRadius: '8px', // Bordes redondeados
+                  paddingLeft: open ? 2 : 0,
+                  backgroundColor: 'rgba(255, 255, 255, 0.05)', // Fondo sutil para los detalles
+                  borderRadius: '8px',
                   display: 'flex',
                   flexDirection: 'column',
-                  gap: '4px', // Espacio entre los subitems reducido
+                  gap: '4px',
                 }}
               >
+                {/* Sub-elementos del acordeón */}
                 {item.subsections && item.subsections.length > 0 ? (
                   item.subsections.map((subItem: any, subIndex: number) => (
                     <Button
@@ -141,19 +183,18 @@ const Sidebar: React.FC<SidebarProps> = ({ open, menuItems }) => {
                       fullWidth
                       onClick={() => navigate(subItem.path)}
                       sx={{
-                        padding: '4px 8px', // Reducir el padding para hacerlos más compactos
-                        color: theme.palette.text.primary,
+                        padding: '6px 12px',
+                        color: theme.palette.common.white,
                         backgroundColor: theme.palette.secondary.main,
-                        borderRadius: '6px', // Bordes más suaves para los subitems
-                        boxShadow: '1px 1px 3px rgba(0, 0, 0, 0.1)', // Sombra suave
-                        textTransform: 'none', // No usar mayúsculas
-                        fontSize: '0.8rem', // Tamaño de fuente reducido
+                        borderRadius: '6px',
+                        boxShadow: '1px 1px 3px rgba(0, 0, 0, 0.1)', // Sombra para resaltar los botones
+                        textTransform: 'none',
+                        fontSize: '0.85rem',
                         '&:hover': {
                           backgroundColor: theme.palette.primary.light,
-                          color: theme.palette.accent.main,
-                          transform: 'scale(1.05)', // Efecto al pasar el mouse por el submenú
+                          color: theme.palette.common.white,
                         },
-                        transition: 'background-color 0.3s ease, color 0.3s ease', // Transición suave
+                        transition: 'background-color 0.3s ease, color 0.3s ease',
                       }}
                     >
                       {subItem.section}
@@ -164,19 +205,18 @@ const Sidebar: React.FC<SidebarProps> = ({ open, menuItems }) => {
                     fullWidth
                     onClick={() => navigate(item.path)}
                     sx={{
-                      padding: '4px 8px', // Reducir el padding para hacerlos más compactos
-                      color: theme.palette.text.primary,
+                      padding: '6px 12px',
+                      color: theme.palette.primary.main,
                       backgroundColor: theme.palette.secondary.main,
-                      borderRadius: '6px', // Bordes más suaves para los subitems
-                      boxShadow: '1px 1px 3px rgba(0, 0, 0, 0.1)', // Sombra suave
-                      textTransform: 'none', // No usar mayúsculas
-                      fontSize: '0.8rem', // Tamaño de fuente reducido
+                      borderRadius: '6px',
+                      boxShadow: '1px 1px 3px rgba(0, 0, 0, 0.1)',
+                      textTransform: 'none',
+                      fontSize: '0.85rem',
                       '&:hover': {
                         backgroundColor: theme.palette.primary.light,
                         color: theme.palette.accent.main,
-                        transform: 'scale(1.05)', // Efecto al pasar el mouse por el submenú
                       },
-                      transition: 'background-color 0.3s ease, color 0.3s ease', // Transición suave
+                      transition: 'background-color 0.3s ease, color 0.3s ease',
                     }}
                   >
                     {item.section}
@@ -188,10 +228,10 @@ const Sidebar: React.FC<SidebarProps> = ({ open, menuItems }) => {
         </List>
       </Box>
 
-      {/* Botón de Cerrar Sesión siempre fijo al final */}
+      {/* Botón de Cerrar Sesión fijo al final del sidebar */}
       <Box sx={{ p: 1 }}>
         <Button
-          fullWidth={open} // Mostrar el botón en toda la anchura solo si está expandido
+          fullWidth={open}
           variant="contained"
           color="error"
           startIcon={<LogoutIcon />}
@@ -199,14 +239,14 @@ const Sidebar: React.FC<SidebarProps> = ({ open, menuItems }) => {
           sx={{
             backgroundColor: theme.palette.accent.main,
             '&:hover': {
-              backgroundColor: theme.palette.accent.light,
+              backgroundColor: theme.palette.error.main,
             },
             borderRadius: '8px',
-            padding: open ? '8px' : '6px', // Ajustar el padding cuando el sidebar está contraído
-            minWidth: open ? '100%' : 'auto', // Mantener el tamaño adecuado cuando está contraído
+            padding: open ? '8px' : '6px',
+            minWidth: open ? '100%' : 'auto',
           }}
         >
-          {open && 'Cerrar Sesión'} {/* Mostrar el texto solo si el sidebar está expandido */}
+          {open && 'Cerrar Sesión'}
         </Button>
       </Box>
     </Drawer>

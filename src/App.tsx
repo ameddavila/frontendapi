@@ -1,4 +1,5 @@
 // src/App.tsx
+import './types/theme.d.ts';
 import React from 'react';
 import { BrowserRouter } from 'react-router-dom';
 import { ThemeProvider } from '@mui/material/styles';

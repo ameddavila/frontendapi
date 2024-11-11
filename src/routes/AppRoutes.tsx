@@ -8,20 +8,24 @@ import ForgotPassword from '../pages/ForgotPassword';
 import PrivateRoute from '../components/PrivateRoute';
 import RegistroEmpleado from '../pages/RegistroEmpleado';
 import AdminBd from '../pages/AdminBd';
+import NutricionRoutes from './NutricionRoutes';
+
 const AppRoutes: React.FC = () => {
   return (
     <Routes>
-      {/* Login siempre será la primera página */}
+      {/* Rutas públicas */}
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
       <Route path="/password-recovery" element={<ForgotPassword />} />
 
-     {/* Ruta protegida para Home */}
-     <Route path="/" element={<PrivateRoute />}>
-        <Route path="/home" element={<Home />} />  {/* Aquí asegúrate de usar "/home"  */}
-        <Route path="RRHH/registrar-personal" element={<RegistroEmpleado />} />  {/* Aquí asegúrate de usar "/home"  registrar-personal*/}
-        <Route path="administracion/adminbd" element={<AdminBd />} />  {/* Aquí asegúrate de usar "/home"  registrar-personal*/}
-  
+      {/* Rutas protegidas */}
+      <Route path="/" element={<PrivateRoute />}>
+        <Route path="/home" element={<Home />} />
+        <Route path="/RRHH/registrar-personal" element={<RegistroEmpleado />} />
+        <Route path="/administracion/adminbd" element={<AdminBd />} />
+
+        {/* Ruta base para las rutas de Nutrición */}
+        <Route path="/nutricion/*" element={<NutricionRoutes />} />
       </Route>
     </Routes>
   );

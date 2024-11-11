@@ -1,4 +1,4 @@
-/// <reference types="vite/client" />
+// src/types/theme.d.ts
 
 import { Palette, PaletteOptions } from '@mui/material/styles';
 

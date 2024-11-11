@@ -45,6 +45,7 @@ const Header: React.FC<HeaderProps> = ({ handleDrawerToggle, open, userDetails }
     <AppBar
       position="fixed"
       sx={{
+        height: { xs: 56, sm: 64 },
         zIndex: (theme) => theme.zIndex.drawer + 1,
         width: open ? `calc(100% - ${drawerWidth}px)` : `calc(100% - 60px)`,  // Cambiar ancho según el estado del sidebar
         marginLeft: open ? `${drawerWidth}px` : '60px',  // Ajustar margen según el estado del sidebar
@@ -66,7 +67,7 @@ const Header: React.FC<HeaderProps> = ({ handleDrawerToggle, open, userDetails }
           <MenuIcon />  {/* Ícono para alternar el sidebar */}
         </IconButton>
         <Typography variant="h6" noWrap sx={{ flexGrow: 1 }}>
-          SIS-AMED {/* Título personalizado */}
+          {/* Título personalizado */}
         </Typography>
         {/* Avatar con funcionalidad de abrir menú */}
         <IconButton onClick={handleMenuOpen}>
